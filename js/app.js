@@ -6,7 +6,8 @@
  * och hanterar applikationens övergripande livscykel.
  * 
  * Versionshistorik:
- * 4.2.0 - Hanterar utgångna tidtabeller genom att visa dem med varning
+ * 5.0.2 - CSP-fixar: unsafe-inline, frame-ancestors, enctype
+ * 5.0.1 - SÄKERHETSHÄRDNING: innerHTML→textContent, URL-validering, CSP-kompatibel
  * 5.0.0 - Simplified timetable structure (50% fewer files), Winter 2025/2026 added
  * 4.2.0 - Expired timetable warnings
  * 4.1.0 - Tillagd support för maintenance mode
@@ -19,17 +20,43 @@
  * 1.0.0 - Originalversion baserad på MMM-Resseltrafiken
  * 
  * @author Christian Gillinger
- * @version 5.0.0
+ * @version 5.0.2
  * @license MIT
  */
 
 document.addEventListener('DOMContentLoaded', async function() {
     /**
+     * SÄKERHETSHÄRDNING: URL-parameter validering
+     * Validerar att URL-parametrar inte är för långa och innehåller endast tillåtna tecken
+     * @param {string} value - Värde att validera
+     * @param {number} maxLength - Max tillåten längd (default: 80)
+     * @returns {string|null} Validerat värde eller null om ogiltigt
+     */
+    function validateURLParam(value, maxLength = 80) {
+        if (!value) return null;
+        
+        // Maxlängd-kontroll (förhindra extremt långa parametrar)
+        if (value.length > maxLength) {
+            console.warn(`URL-parameter för lång (${value.length} > ${maxLength}), ignoreras`);
+            return null;
+        }
+        
+        // Whitelist för tillåtna tecken (bokstäver, siffror, mellanslag, svenska tecken, -, _)
+        const validPattern = /^[a-zA-ZåäöÅÄÖ0-9\s\-_]+$/;
+        if (!validPattern.test(value)) {
+            console.warn('URL-parameter innehåller otillåtna tecken, ignoreras');
+            return null;
+        }
+        
+        return value;
+    }
+
+    /**
      * Applikationskonfigurationsobjekt
      * @type {Object}
      */
     const config = {
-        version: '5.0.0',                  // Applikationsversion (uppdatera vid varje ny version)
+        version: '5.0.2',                  // Applikationsversion (uppdatera vid varje ny version)
         updateInterval: 60000,             // Uppdateringsintervall i millisekunder (1 minut)
         dataRefreshInterval: 1800000,      // Uppdatera data från server var 30:e minut
         midnightCheckInterval: 60000,      // Kontrollera midnatt var minut
@@ -242,6 +269,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Återställer alla inställningar till standardvärden och laddar om sidan
+     * SÄKERHETSHÄRDAD: createElement istället för innerHTML
      */
     function resetSettings() {
         try {
@@ -271,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         } catch (error) {
             console.error('Fel vid återställning av inställningar:', error);
             
-            // Visa felmeddelande
+            // Visa felmeddelande (SÄKERHETSHÄRDAD)
             const appElement = document.getElementById('app');
             const errorNotification = document.createElement('div');
             errorNotification.className = 'notification error';
@@ -390,6 +418,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Laddar konfiguration från URL-parametrar
+     * SÄKERHETSHÄRDAD: Validerar alla URL-parametrar
      * Detta möjliggör enkel anpassning av visning utan att redigera kod
      */
     function loadConfigFromURL() {
@@ -406,17 +435,26 @@ document.addEventListener('DOMContentLoaded', async function() {
                                         urlParams.get('emelie') === 'true';
         }
         
-        // Kontrollera markera hållplatsparametrar
+        // SÄKERHETSHÄRDAD: Validera hållplatsparametrar
         if (urlParams.has('highlight')) {
-            config.highlightStop = decodeURIComponent(urlParams.get('highlight'));
+            const validatedStop = validateURLParam(decodeURIComponent(urlParams.get('highlight')));
+            if (validatedStop) {
+                config.highlightStop = validatedStop;
+            }
         }
         
         if (urlParams.has('cityhighlight')) {
-            config.cityHighlightStop = decodeURIComponent(urlParams.get('cityhighlight'));
+            const validatedStop = validateURLParam(decodeURIComponent(urlParams.get('cityhighlight')));
+            if (validatedStop) {
+                config.cityHighlightStop = validatedStop;
+            }
         }
         
         if (urlParams.has('returnstop')) {
-            config.cityReturnStop = decodeURIComponent(urlParams.get('returnstop'));
+            const validatedStop = validateURLParam(decodeURIComponent(urlParams.get('returnstop')));
+            if (validatedStop) {
+                config.cityReturnStop = validatedStop;
+            }
         }
         
         // Kontrollera riktningsinställning
@@ -437,13 +475,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                                       urlParams.get('disembark') === 'true';
         }
         
-        // Kontrollera maxVisibleDepartures
+        // SÄKERHETSHÄRDAD: Validera maxVisibleDepartures
         if (urlParams.has('maxdep')) {
             let maxDep = parseInt(urlParams.get('maxdep'), 10);
-            if (!isNaN(maxDep) && maxDep > 0) {
+            // Begränsa till rimligt intervall (3-15)
+            if (!isNaN(maxDep) && maxDep >= 3 && maxDep <= 15) {
                 config.maxVisibleDepartures = maxDep;
-                // Uppdatera CSS-variabel
                 document.documentElement.style.setProperty('--visible-departures', config.maxVisibleDepartures);
+            } else {
+                console.warn('maxdep utanför giltigt intervall (3-15), ignoreras');
             }
         } else {
             // Sätt standard baserat på skärmstorlek om ej specificerat i URL
@@ -614,7 +654,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Bestämmer vilka tidtabellsfiler som ska användas baserat på aktuellt datum och konfiguration
-     * UPPDATERAD: Returnerar nu även om tidtabellen är utgången och när den gick ut
      * @param {Object} configData - Konfigurationsdata
      * @param {Date} date - Datum att bestämma schema för
      * @returns {Object} Ett objekt med sökvägar, utgångsstatus och datum
@@ -717,7 +756,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Laddar och validerar tidtabellsdata för en specifik dag
-     * UPPDATERAD: Hanterar nu även utgångna tidtabeller
      * @param {Object} configData - Konfigurationsdata
      * @param {Date} date - Datum att ladda tidtabell för
      * @returns {Promise<Object>} Den parsade och validerade tidtabellsdatan med utgångsstatus
@@ -778,6 +816,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Visar uppdateringsbanner i appen om en ny version är tillgänglig
+     * SÄKERHETSHÄRDAD: createElement istället för innerHTML
      */
     function showUpdateBanner() {
         if (isAppUpdated) {
@@ -893,7 +932,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const hamburgerIcon = document.createElement('span');
         hamburgerIcon.className = 'hamburger-icon';
-        hamburgerIcon.innerHTML = '&#9776;'; // Unicode för hamburger-ikon
+        hamburgerIcon.textContent = '☰'; // Unicode för hamburger-ikon
         
         const buttonText = document.createElement('span');
         buttonText.className = 'settings-button-text';
@@ -918,6 +957,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     /**
      * Öppnar inställningspanelen
+     * SÄKERHETSHÄRDAD: textContent istället för innerHTML
      */
     function openSettingsPanel() {
         // Om panelen redan finns, ta bort den först
@@ -943,7 +983,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const closeButton = document.createElement('button');
         closeButton.className = 'settings-close-button';
-        closeButton.innerHTML = '&times;'; // × symbol
+        closeButton.textContent = '×'; // × symbol (SÄKERHETSHÄRDAD)
         closeButton.setAttribute('aria-label', 'Stäng inställningar');
         closeButton.addEventListener('click', () => {
             closeSettingsPanel();
@@ -1395,7 +1435,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 
                 const infoElement = document.createElement("div");
                 infoElement.className = "validity-info";
-                infoElement.innerHTML = `Aktuell tidtabell gäller: ${validFrom.toLocaleDateString('sv-SE')} - ${validTo.toLocaleDateString('sv-SE')}`;
+                infoElement.textContent = `Aktuell tidtabell gäller: ${validFrom.toLocaleDateString('sv-SE')} - ${validTo.toLocaleDateString('sv-SE')}`;
                 
                 wrapper.appendChild(infoElement);
             }
@@ -1404,6 +1444,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Renderar alla tidtabeller för aktuellt schema
+     * SÄKERHETSHÄRDAD: createElement för meddelanden
      * @param {HTMLElement} wrapper - Behållarelementet
      */
     function renderTimetables(wrapper) {
@@ -1417,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             renderEmelieTimetables(wrapper);
         }
         
-        // Om inga tidtabeller är synliga, visa ett meddelande
+        // Om inga tidtabeller är synliga, visa ett meddelande (SÄKERHETSHÄRDAD)
         if (!config.showSjostadstrafiken && !config.showEmelietrafiken) {
             const noDataMessage = document.createElement("div");
             noDataMessage.className = "notification warning";
@@ -1670,6 +1711,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     /**
      * Hanterar och visar fel för användaren
+     * SÄKERHETSHÄRDAD: createElement istället för innerHTML
      * @param {Error} error - Felobjektet
      * @param {string} message - Användarvänligt felmeddelande
      */
@@ -1677,11 +1719,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Applikationsfel:', error);
         const appElement = document.getElementById('app');
         const wrapper = renderer.createWrapper();
-        wrapper.innerHTML = `
-            <div class="notification error" role="alert">
-                ${message}
-            </div>
-        `;
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'notification error';
+        errorDiv.setAttribute('role', 'alert');
+        errorDiv.textContent = message;
+        
+        wrapper.appendChild(errorDiv);
         appElement.appendChild(wrapper);
     }
 

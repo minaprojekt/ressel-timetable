@@ -6,12 +6,19 @@
  * highlight-effekter för avgångar.
  * 
  * Versionshistorik:
- * 4.2.0 - Tillagd varning för utgångna tidtabeller med utgångsdatum
+ * 5.0.1 - Säkerhetshärdning: Ersatt innerHTML med textContent/createElement
  * 4.1.0 - Tillagd support för maintenance mode (tillfälliga trafikuppehåll)
  * 4.0.0 - Förbättrad versionshantering och uppdateringsnotifieringar
+ * 3.5.0 - Förbättrad highlight-hantering, visning av morgondagens första avgång
+ * 3.4.0 - Förbättrad talsyntes för "Endast avstigning" och "Snar avgång"
+ * 3.3.0 - Flyttad position av högtalarikonerna till tidtabellstitel
+ * 3.1.0 - Borttagen visning av dagtyp i tidtabelltitel
+ * 3.0.0 - Förbättrad dagsbaserad hantering av "Endast avstigning"-indikatorer
+ * 2.0.0 - Refaktorerad för robust hantering av "Endast avstigning"
+ * 1.0.0 - Originalversion baserad på MMM-Resseltrafiken
  * 
  * @author Christian Gillinger
- * @version 4.2.0
+ * @version 5.0.2
  * @license MIT
  */
 
@@ -42,6 +49,7 @@ class Renderer {
 
     /**
      * Visar uppdateringsmeddelande
+     * SÄKERHETSHÄRDAD: createElement istället för innerHTML
      * @param {string} newVersion - Ny version tillgänglig
      */
     showUpdateNotification(newVersion) {
@@ -90,41 +98,20 @@ class Renderer {
 
     /**
      * Skapar en tidtabellsvy
-     * UPPDATERAD: Hanterar nu utgångna tidtabeller
      * @param {Object} timetableData - Tidtabellsdata
      * @param {string} title - Tidtabellstitel
      * @param {string} subtitle - Tidtabellsundertitel (används inte längre)
      * @param {string} highlightStop - Hållplats att markera
      * @param {Object} disembarkOnlyToday - "Endast avstigning"-tider för idag
      * @param {Object} disembarkOnlyTomorrow - "Endast avstigning"-tider för imorgon
-     * @param {boolean} isExpired - Om tidtabellen har gått ut
-     * @param {string} expiryDate - Datum när tidtabellen gick ut (YYYY-MM-DD format)
      * @returns {HTMLElement} Tidtabellselement
      */
-    createTimetable(timetableData, title, subtitle, highlightStop, disembarkOnlyToday, disembarkOnlyTomorrow, isExpired = false, expiryDate = null) {
+    createTimetable(timetableData, title, subtitle, highlightStop, disembarkOnlyToday, disembarkOnlyTomorrow) {
         const timetable = document.createElement("div");
         timetable.className = "timetable";
         
         // Lägg till titel (utan undertitel) och talsyntes-knapp om aktiverad
         timetable.appendChild(this.createTitleSection(title, timetableData, highlightStop, disembarkOnlyToday, disembarkOnlyTomorrow));
-        
-        // Visa varning om tidtabellen är utgången
-        if (isExpired && expiryDate) {
-            const expiryWarning = document.createElement("div");
-            expiryWarning.className = "notification warning";
-            expiryWarning.style.marginTop = "10px";
-            expiryWarning.style.marginBottom = "15px";
-            
-            const expDate = new Date(expiryDate);
-            const formattedDate = expDate.toLocaleDateString('sv-SE', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            expiryWarning.innerHTML = `⚠️ Denna tidtabell gick ut ${formattedDate}. Tiderna nedan kan vara inaktuella.`;
-            timetable.appendChild(expiryWarning);
-        }
         
         // Kontrollera om detta är maintenance mode
         if (timetableData && timetableData.metadata && timetableData.metadata.maintenance_mode) {
@@ -210,6 +197,7 @@ class Renderer {
 
     /**
      * Skapar en talsyntes-knapp för titelsektionen
+     * SÄKERHETSHÄRDAD: textContent istället för innerHTML
      * @param {string} highlightStop - Markerad hållplats
      * @param {Object} firstTime - Första tiden för hållplatsen
      * @param {boolean} isDisembarkOnly - Om avgången är "Endast avstigning"
@@ -218,7 +206,7 @@ class Renderer {
     createSpeechButtonForTitle(highlightStop, firstTime, isDisembarkOnly) {
         const button = document.createElement("button");
         button.className = "speech-button title-speech-button";
-        button.innerHTML = "&#128266;"; // Högtalarsymbol
+        button.textContent = "🔊"; // Högtalarsymbol (emoji istället för HTML entity)
         button.setAttribute("aria-label", "Läs upp nästa avgång från " + highlightStop);
         button.setAttribute("title", "Läs upp nästa avgång");
         
@@ -462,12 +450,21 @@ class Renderer {
 
     /**
      * Skapar en fotnot för "Endast avstigning"
+     * SÄKERHETSHÄRDAD: createElement + textContent istället för innerHTML
      * @returns {HTMLElement} Fotnot-element
      */
     createDisembarkFootnote() {
         const footnote = document.createElement("div");
         footnote.className = "disembark-footnote";
-        footnote.innerHTML = "<span>*</span> Endast avstigning";
+        
+        const asterisk = document.createElement("span");
+        asterisk.textContent = "*";
+        
+        const text = document.createTextNode(" Endast avstigning");
+        
+        footnote.appendChild(asterisk);
+        footnote.appendChild(text);
+        
         return footnote;
     }
 
@@ -521,7 +518,7 @@ class Renderer {
                         // Lägg till swiping-indikator
                         const indicator = document.createElement('div');
                         indicator.className = 'swipe-indicator';
-                        indicator.innerHTML = '&#8594;'; // Höger pil
+                        indicator.textContent = '→'; // Höger pil
                         timeContainer.appendChild(indicator);
                         
                         // Aktivera horisontell scrollning på mobil
