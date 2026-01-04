@@ -92,13 +92,6 @@ data/
 
 ---
 
-## Deployment
-
-Projektet är helt statiskt och deployeras automatiskt via **GitHub Pages** direkt från `main`-branchen.
-
-Varje `git push` publicerar ändringarna.
-
----
 
 ## Bidra
 
