@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- Primary Meta Tags -->
+    <title>Sjöstadsfärjetrafiken - Tidtabell för Sjöstadstrafiken och M/S Emelie</title>
+    <meta name="title" content="Sjöstadsfärjetrafiken - Tidtabell för Sjöstadstrafiken och M/S Emelie">
+    <meta name="description" content="Aktuella tidtabeller för båttrafiken i Hammarby Sjöstad med Sjöstadstrafiken och M/S Emelie">
+    <meta name="author" content="Christian Gillinger">
+    <meta name="version" content="5.0.0">
+    <meta name="app-version" content="5.0.0">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cgillinger.github.io/ressel-static/">
+    <meta property="og:title" content="Sjöstadsfärjetrafiken - Tidtabell för Sjöstadstrafiken och M/S Emelie">
+    <meta property="og:description" content="Aktuella tidtabeller för båttrafiken i Hammarby Sjöstad">
+    <meta property="og:image" content="./icons/boat.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://cgillinger.github.io/ressel-static/">
+    <meta property="twitter:title" content="Sjöstadsfärjetrafiken">
+    <meta property="twitter:description" content="Aktuella tidtabeller för båttrafiken i Hammarby Sjöstad">
+    <meta property="twitter:image" content="./icons/boat.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/boat.png">
+    <link rel="apple-touch-icon" href="./icons/boat.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/styles.css">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- iOS Web App Configuration -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sjöstadsfärjetrafiken">
+    
+    <!-- Accessibility Metadata -->
+    <meta name="accessibility" content="Stöd för skärmläsare och talsyntes">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app" role="main" aria-live="polite">
+        <!-- Content will be dynamically inserted here -->
+        <noscript>
+            <div class="notification error">
+                JavaScript måste vara aktiverat för att visa tidtabellerna.
+            </div>
+        </noscript>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading" aria-hidden="true">
+        Laddar tidtabeller...
+    </div>
+
+    <!-- Update notification -->
+    <div id="update-notification" class="update-notification" role="alert" style="display: none;">
+        <div class="update-content">
+            <span>Ny version tillgänglig!</span>
+            <button id="update-now-btn">Uppdatera nu</button>
+        </div>
+    </div>
+
+    <!-- Error Boundary -->
+    <div id="error-container" role="alert" aria-atomic="true"></div>
+
+    <!-- Application Scripts -->
+    <script src="./js/timehandler.js"></script>
+    <script src="./js/renderer.js"></script>
+    <script src="./js/app.js"></script>
+
+    <!-- Error Tracking -->
+    <script>
+        window.APP_VERSION = '5.0.0';
+
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Error:', {
+                message: msg,
+                url: url,
+                line: lineNo,
+                column: columnNo,
+                error: error
+            });
+
+            // Display user-friendly error message
+            const errorContainer = document.getElementById('error-container');
+            if (errorContainer) {
+                errorContainer.innerHTML = `
+                    <div class="notification error">
+                        Ett fel uppstod. Försök ladda om sidan.
+                    </div>
+                `;
+            }
+            return false;
+        };
+
+        // Remove loading indicator when page is fully loaded
+        window.addEventListener('load', function() {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Handle update button click
+        document.getElementById('update-now-btn').addEventListener('click', function() {
+            // Clear caches and reload page
+            if ('caches' in window) {
+                caches.keys().then(function(cacheNames) {
+                    cacheNames.forEach(function(cacheName) {
+                        caches.delete(cacheName);
+                    });
+                    location.reload(true);
+                });
+            } else {
+                location.reload(true);
+            }
+        });
+
+        // Listen for messages from the service worker
+        navigator.serviceWorker.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                // Show update notification
+                document.getElementById('update-notification').style.display = 'block';
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version installed but not activated yet
+                                    document.getElementById('update-notification').style.display = 'block';
+                                }
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Version Information -->
+    <footer role="contentinfo">
+        <small>
+            Sjöstadsfärjetrafiken v5.0.0 | Utvecklad av Christian Gillinger | Detta är en inofficiell tjänst och har inget med Ressel Rederi att göra
+        </small>
+    </footer>
+</body>
+</html>

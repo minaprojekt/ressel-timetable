@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "valid_period": {
+      "start": "2025-11-14",
+      "end": "2025-12-12"
+    },
+    "day_type": "sunday",
+    "maintenance_mode": true,
+    "maintenance_message": "Linjen har tillfälligt uppehåll på grund av broarbeten. Välkomna åter 13 december 2025!"
+  },
+  "to_city": {
+    "operating_hours": {
+      "start": "00:00",
+      "end": "00:00"
+    },
+    "departures": {}
+  },
+  "from_city": {
+    "operating_hours": {
+      "start": "00:00",
+      "end": "00:00"
+    },
+    "departures": {}
+  },
+  "disembark_only": {
+    "from_city": {}
+  }
+}

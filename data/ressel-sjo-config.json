@@ -1,0 +1,93 @@
+{
+  "_metadata": {
+    "version": "7.0.0",
+    "last_updated": "2025-12-13",
+    "description": "FÖRENKLAD struktur - 3 generiska filer istället för 6 säsongsspecifika",
+    "data_sources": [
+      "Avgångstider Barnängsbryggan (PDF)",
+      "Avgångstider Lumabryggan (PDF)",
+      "Avgångstider Henriksdalsbryggan (PDF)"
+    ],
+    "calculation_systems": {
+      "pattern": "Triangular route with 5 minute offset between stops",
+      "base_calculation": "XX:00 (Barnäng) -> XX:05 (Luma) -> XX:10 (Henriksdal)",
+      "intervals": {
+        "summer": "20 minutes constant",
+        "winter_spring_fall": "20 minutes normal, 10 minutes during rush hour",
+        "weekend": "20 minutes constant (year-round, identical all seasons)"
+      }
+    },
+    "update_cycle": "Files are generic and reused across seasons",
+    "validation_rules": [
+      "All times must be in HH:MM format",
+      "All dates must be in YYYY-MM-DD format"
+    ]
+  },
+  "metadata": {
+    "valid_period": {
+      "start": "2024-01-01",
+      "end": "2099-12-31",
+      "source": "Generic timetables valid year-round"
+    },
+    "type": "free",
+    "pattern_type": "triangle",
+    "notes": [
+      "Röda dagar trafikeras som helg",
+      "Julafton, nyårsafton samt midsommarafton trafikeras som helg"
+    ]
+  },
+  "service_configuration": {
+    "stop_sequence": ["Barnängsbryggan", "Lumabryggan", "Henriksdalsbryggan"],
+    "base_interval": 20,
+    "rush_hours": [
+      {
+        "period": "07:00-09:00",
+        "interval": 10,
+        "seasons": ["winter", "spring", "fall"]
+      },
+      {
+        "period": "15:50-18:00",
+        "interval": 10,
+        "seasons": ["winter", "spring", "fall"]
+      }
+    ]
+  },
+  "season_mapping": [
+    {
+      "name": "Höst/Vinter/Vår (med rusningstid)",
+      "period": {
+        "start": "2024-08-18",
+        "end": "2025-06-20",
+        "note": "Används höst, vinter och vår"
+      },
+      "files": {
+        "weekday": "ressel-sjo-weekday-standard.json",
+        "weekend": "ressel-sjo-weekend.json"
+      }
+    },
+    {
+      "name": "Sommar (utan rusningstid)",
+      "period": {
+        "start": "2025-06-21",
+        "end": "2025-08-17",
+        "note": "Används enbart sommar - ingen rusningstrafik"
+      },
+      "files": {
+        "weekday": "ressel-sjo-weekday-summer.json",
+        "weekend": "ressel-sjo-weekend.json"
+      }
+    },
+    {
+      "name": "Höst/Vinter/Vår 2025-2026 (med rusningstid)",
+      "period": {
+        "start": "2025-08-18",
+        "end": "2099-12-31",
+        "note": "Återgår till standard med rusningstrafik"
+      },
+      "files": {
+        "weekday": "ressel-sjo-weekday-standard.json",
+        "weekend": "ressel-sjo-weekend.json"
+      }
+    }
+  ]
+}

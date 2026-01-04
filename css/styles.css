@@ -1,0 +1,846 @@
+/**
+ * Sjöstadsfärjetrafiken Web Application - Styles
+ * 
+ * Global styling för Sjöstadsfärjetrafiken-applikationen.
+ * Inkluderar mörkt tema, responsiv design och tillgänglighetsfunktioner.
+ * 
+ * Versionshistorik:
+ * 4.0.0 - Tillagd styling för uppdateringsnotifikationer, versionshantering
+ * 3.2.0 - Uppdaterad position av talsyntes-knappen till titelsektionen
+ * 3.1.0 - Justerad layout för titelsektionen, borttagna undertitlar
+ * 3.0.0 - Tillagd styling för "Endast avstigning" indikator
+ * 2.0.0 - Tillagd inställningspanel, hamburger-meny och förbättrat mobilstöd
+ * 1.0.0 - Originalversion baserad på MMM-Resseltrafiken
+ * 
+ * @author Christian Gillinger
+ * @version 4.0.0
+ * @license MIT
+ */
+
+/* CSS Custom Properties - Theme Variables */
+:root {
+    /* Colors */
+    --color-text: #EEEEEE;
+    --color-text-dimmed: #666666;
+    --color-text-bright: #FFFFFF;
+    --color-background: #000000;
+    --color-highlight-green: #00ff00;
+    --color-highlight-yellow: #ffff00;
+    --color-error: #ff0000;
+    --color-panel-background: #121212;
+    --color-panel-border: #333333;
+    --color-speech-button: rgba(0, 255, 0, 0.15);
+    --color-speech-button-hover: rgba(0, 255, 0, 0.25);
+    --color-speech-button-active: rgba(0, 255, 0, 0.45);
+    --color-reset-button: rgba(255, 0, 0, 0.15);
+    --color-reset-button-hover: rgba(255, 0, 0, 0.25);
+    --color-disembark-indicator: rgba(255, 255, 0, 0.8);
+    --color-update-banner: rgba(0, 128, 255, 0.15);
+    --color-update-button: rgba(0, 128, 255, 0.25);
+    --color-update-button-hover: rgba(0, 128, 255, 0.35);
+    
+    /* Typography */
+    --font-primary: "Roboto Condensed", system-ui, sans-serif;
+    --font-size-base: 20px;
+    --font-size-small: 16px;
+    --font-size-large: 22px;
+    
+    /* Spacing */
+    --gap-body-top: 60px;
+    --gap-modules: 30px;
+    --stop-column-width: 200px;
+    --time-column-width: 45px;
+    --time-column-gap: 10px;
+    
+    /* Layout */
+    --visible-departures: 9;
+    --container-max-width: 1200px;
+    --border-radius: 4px;
+    --settings-panel-width: 320px;
+    
+    /* Transitions */
+    --transition-speed: 0.3s;
+    --panel-transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Base Styles */
+html {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-size: var(--font-size-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-primary);
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Main Container */
+#app {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Update notification banner */
+.update-notification {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-update-banner);
+    padding: 12px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.update-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.update-content span {
+    color: var(--color-text-bright);
+    font-weight: bold;
+}
+
+#update-now-btn, .update-button {
+    background-color: var(--color-update-button);
+    border: none;
+    color: var(--color-text-bright);
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: bold;
+    transition: background-color var(--transition-speed) ease;
+}
+
+#update-now-btn:hover, .update-button:hover {
+    background-color: var(--color-update-button-hover);
+}
+
+/* Update banner for in-app notification */
+.update-banner {
+    background-color: var(--color-update-banner);
+    color: var(--color-text-bright);
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    width: 100%;
+}
+
+.update-banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Speech Synthesis Button - Updated for title positioning */
+.speech-button {
+    background-color: var(--color-speech-button);
+    color: var(--color-text-bright);
+    border: none;
+    border-radius: var(--border-radius);
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    z-index: 5;
+}
+
+/* Title speech button styling - New */
+.title-speech-button {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    background-color: rgba(0, 128, 0, 0.25);
+}
+
+.speech-button:hover {
+    background-color: var(--color-speech-button-hover);
+}
+
+.speech-button:focus {
+    outline: 2px solid var(--color-highlight-green);
+    outline-offset: 2px;
+}
+
+.speech-button.speaking {
+    background-color: var(--color-speech-button-active);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Settings Button (Hamburger icon) */
+.settings-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: var(--border-radius);
+    background-color: rgba(0, 255, 0, 0.15);
+    color: var(--color-highlight-green);
+    cursor: pointer;
+    width: fit-content;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.settings-button:hover {
+    background-color: rgba(0, 255, 0, 0.25);
+}
+
+.settings-button:focus {
+    outline: 2px solid var(--color-highlight-green);
+    outline-offset: 2px;
+}
+
+.hamburger-icon {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.settings-button-text {
+    font-weight: bold;
+    color: var(--color-text-bright); /* Vit text istället för grön */
+}
+
+/* Settings Panel Overlay */
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+}
+
+.settings-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--settings-panel-width);
+    max-width: 90vw;
+    height: 100%;
+    background-color: var(--color-panel-background);
+    border-left: 1px solid var(--color-panel-border);
+    z-index: 1000;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: var(--panel-transition);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.settings-panel.open {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Settings Panel Header */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-panel-border);
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: var(--font-size-large);
+    color: var(--color-highlight-green);
+}
+
+.settings-close-button {
+    background: none;
+    border: none;
+    color: var(--color-text-bright);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+}
+
+.settings-close-button:hover {
+    color: var(--color-highlight-green);
+}
+
+/* Settings Panel Content */
+.settings-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.settings-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--color-panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-button-close {
+    background-color: rgba(0, 255, 0, 0.15);
+    color: var(--color-highlight-green);
+    border: none;
+    padding: 8px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-small);
+}
+
+.settings-button-close:hover {
+    background-color: rgba(0, 255, 0, 0.25);
+}
+
+/* Reset button styling */
+.settings-button-reset {
+    background-color: var(--color-reset-button);
+    color: var(--color-error);
+    border: none;
+    padding: 8px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-small);
+}
+
+.settings-button-reset:hover {
+    background-color: var(--color-reset-button-hover);
+}
+
+.settings-button-reset:focus {
+    outline: 2px solid var(--color-error);
+    outline-offset: 2px;
+}
+
+/* Settings Groups */
+.settings-group {
+    margin-bottom: 24px;
+}
+
+/* Special handling for directions group when hidden */
+.directions-group[style*="display: none"] {
+    display: none !important;
+    margin: 0;
+    padding: 0;
+}
+
+.settings-group-title {
+    font-size: var(--font-size-small);
+    color: var(--color-text-dimmed);
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+/* Setting Items */
+.setting-item {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+/* Toggle Container in Settings Panel */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-container input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: var(--color-text-dimmed);
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.toggle-container input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--color-text-bright);
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-speed) ease;
+}
+
+.toggle-container input[type="checkbox"]:checked {
+    background-color: var(--color-highlight-green);
+}
+
+.toggle-container input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
+}
+
+.toggle-container label {
+    color: var(--color-text-bright);
+    cursor: pointer;
+}
+
+/* Select Container in Settings Panel */
+.select-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.settings-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-bright);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    padding: 6px 8px;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.settings-select:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.settings-select:focus {
+    outline: 2px solid var(--color-highlight-green);
+    outline-offset: 2px;
+}
+
+.settings-select option {
+    background-color: var(--color-background);
+    color: var(--color-text-bright);
+}
+
+/* Validity Info */
+.validity-info {
+    margin-bottom: 15px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-dimmed);
+    text-align: left; /* Changed from center to left */
+}
+
+/* Resseltrafiken Module Container */
+.MMM-Resseltrafiken {
+    color: var(--color-text-bright);
+    padding: 0;
+    margin: 0;
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Individual Timetable Container */
+.MMM-Resseltrafiken .timetable {
+    margin-bottom: var(--gap-modules);
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+}
+
+/* Title Section - Updated for flexbox layout */
+.MMM-Resseltrafiken .title-section {
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    position: relative;
+    display: flex;
+    justify-content: space-between; /* Space between title and speech button */
+    align-items: center;
+    width: 100%;
+}
+
+/* Title Styling */
+.MMM-Resseltrafiken .title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-large);
+    color: var(--color-text-bright);
+}
+
+/* Title Underline */
+.MMM-Resseltrafiken .title-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Title Icon */
+.MMM-Resseltrafiken .title img {
+    height: 50px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+/* Departures Header */
+.MMM-Resseltrafiken .departures-header {
+    font-size: var(--font-size-small);
+    color: var(--color-text-dimmed);
+    margin-bottom: 10px;
+    text-align: left;
+    margin-left: calc(var(--stop-column-width) + 15px);
+}
+
+/* Row Container */
+.MMM-Resseltrafiken .row {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    position: relative;
+    min-height: 22px;
+    color: var(--color-text-bright) !important;
+}
+
+/* Stop Name */
+.MMM-Resseltrafiken .stop {
+    width: var(--stop-column-width);
+    min-width: var(--stop-column-width);
+    text-align: left;
+    padding-left: 15px;
+    font-size: var(--font-size-small);
+    color: var(--color-text-bright);
+}
+
+/* Highlighted Stop */
+.MMM-Resseltrafiken .highlight-stop .stop {
+    color: var(--color-highlight-green);
+}
+
+/* Times Container */
+.MMM-Resseltrafiken .times {
+    display: flex;
+    gap: var(--time-column-gap);
+    flex-wrap: nowrap;
+}
+
+/* Individual Time Slot */
+.MMM-Resseltrafiken .times span.time {
+    display: inline-block;
+    width: var(--time-column-width);
+    min-width: var(--time-column-width);
+    text-align: center;
+    color: var(--color-text-bright) !important;
+    padding: 2px 4px;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+    position: relative; /* Important for absolute positioning of highlight */
+    box-sizing: content-box;
+}
+
+/* Tomorrow Time */
+.MMM-Resseltrafiken .times span.tomorrow-time {
+    font-style: italic;
+    color: var(--color-text-bright) !important;
+}
+
+/* "Endast avstigning" Time */
+.MMM-Resseltrafiken .times span.disembark-only {
+    position: relative;
+}
+
+/* "Endast avstigning" Indicator (asterisk) */
+.MMM-Resseltrafiken .times span.disembark-only .disembark-indicator {
+    position: absolute;
+    top: -5px;
+    right: -2px;
+    font-size: 14px;
+    color: var(--color-disembark-indicator);
+    font-weight: bold;
+}
+
+/* Disembark-only Footnote */
+.MMM-Resseltrafiken .disembark-footnote {
+    font-size: var(--font-size-small);
+    color: var(--color-text-bright);
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-align: right;
+    font-style: italic;
+}
+
+.MMM-Resseltrafiken .disembark-footnote span {
+    color: var(--color-disembark-indicator);
+    font-weight: bold;
+}
+
+/* Highlighted Stop Row */
+.MMM-Resseltrafiken .highlight-stop {
+    position: relative;
+}
+
+/* Green Indicator Line */
+.MMM-Resseltrafiken .highlight-stop::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--color-highlight-green);
+    border-radius: 2px;
+}
+
+/* Next Departure Highlight - Green */
+.MMM-Resseltrafiken .times span.highlight-green {
+    font-weight: bold;
+    /* Remove border and use ::after pseudo-element instead */
+    border: none;
+    position: relative;
+}
+
+.MMM-Resseltrafiken .times span.highlight-green::after {
+    content: '';
+    position: absolute;
+    /* Center position exactly */
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    /* Create border */
+    border: 2px solid var(--color-highlight-green);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    /* Place behind the text */
+    z-index: -1;
+    /* Prevent interaction with the border */
+    pointer-events: none;
+}
+
+/* Imminent Departure Highlight - Yellow */
+.MMM-Resseltrafiken .times span.highlight-yellow {
+    font-weight: bold;
+    /* Remove border and use ::after pseudo-element instead */
+    border: none;
+    position: relative;
+}
+
+.MMM-Resseltrafiken .times span.highlight-yellow::after {
+    content: '';
+    position: absolute;
+    /* Center position exactly */
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    /* Create border */
+    border: 2px solid var(--color-highlight-yellow);
+    border-radius: var(--border-radius);
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+    /* Place behind the text */
+    z-index: -1;
+    /* Prevent interaction with the border */
+    pointer-events: none;
+}
+
+/* Notifications */
+.MMM-Resseltrafiken .notification {
+    font-style: italic;
+    font-size: var(--font-size-small);
+    margin-bottom: 10px;
+    text-align: left;
+    padding: 10px;
+    border-radius: var(--border-radius);
+}
+
+.MMM-Resseltrafiken .notification.warning {
+    color: var(--color-highlight-yellow);
+    background-color: rgba(255, 255, 0, 0.1);
+}
+
+.MMM-Resseltrafiken .notification.error {
+    color: var(--color-error);
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Footer Styling */
+footer {
+    text-align: left;
+    padding: 20px;
+    color: var(--color-text-dimmed);
+    font-size: var(--font-size-small);
+    width: 100%;
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+}
+
+/* Force Dark Theme */
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-text: #EEEEEE;
+        --color-text-dimmed: #666666;
+        --color-text-bright: #FFFFFF;
+        --color-background: #000000;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    :root {
+        --font-size-base: 16px;
+        --font-size-small: 14px;
+        --font-size-large: 18px;
+        --gap-body-top: 20px;
+        --gap-modules: 15px;
+        --stop-column-width: 150px;
+        --time-column-width: 40px;
+        --time-column-gap: 8px;
+    }
+
+    .MMM-Resseltrafiken .title img {
+        height: 40px;
+    }
+    
+    .title-speech-button {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+
+    #app {
+        padding: 10px;
+    }
+    
+    .settings-panel {
+        width: 85vw;
+    }
+    
+    .update-notification {
+        padding: 10px;
+    }
+    
+    .update-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #update-now-btn, .update-button {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --stop-column-width: 120px;
+        --time-column-width: 35px;
+        --time-column-gap: 6px;
+    }
+
+    .MMM-Resseltrafiken .title img {
+        height: 30px;
+    }
+    
+    .title-speech-button {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .settings-panel {
+        width: 100vw;
+    }
+    
+    .update-banner-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .update-banner {
+        padding: 10px;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+.MMM-Resseltrafiken .times span:focus {
+    outline: 2px solid var(--color-error);
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .MMM-Resseltrafiken {
+        background: white;
+        color: black;
+    }
+
+    .settings-button,
+    .settings-panel,
+    .settings-overlay,
+    .speech-button,
+    .update-notification,
+    .update-banner {
+        display: none;
+    }
+}

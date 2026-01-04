@@ -1,0 +1,208 @@
+{
+  "_metadata": {
+    "version": "10.0.0",
+    "last_updated": "2025-12-13",
+    "description": "FÖRENKLAD struktur - generiska filer för vinter/vår/höst, separata för sommar",
+    "data_sources": [
+      "CITY LINE VINTER 2024/2025 (PDF)",
+      "CITY LINE VÅREN 2025 (PDF)",
+      "CITY LINE SOMMAREN 2025 (PDF)",
+      "CITY LINE HÖSTEN 2025 (PDF)",
+      "CITY LINE VINTER 2025/2026 (PDF) - NY"
+    ],
+    "update_cycle": "Generic files reused across similar seasons",
+    "validation_rules": [
+      "All times must be in HH:MM format",
+      "All dates must be in YYYY-MM-DD format"
+    ]
+  },
+  "metadata": {
+    "type": "paid",
+    "pricing": {
+      "single": {
+        "adult": 75,
+        "senior_youth": 60
+      },
+      "day": {
+        "adult": 125,
+        "senior_youth": 90
+      },
+      "multi_trip": {
+        "trips": 10,
+        "adult": 560,
+        "senior_youth": 380
+      },
+      "monthly": {
+        "adult": 960,
+        "senior_youth": 640
+      }
+    },
+    "notes": {
+      "payment": "Endast betalning med kort - only payment by credit card: Visa & Master Card",
+      "children": "Barn under 13 år reser gratis i målsmans sällskap",
+      "bicycles": "Cyklar medföres avgiftsfritt på egen risk",
+      "youth_age": "13-18 år",
+      "lunch_break": "Lunch-paus: Inga avgångar 13:28, 13:50, 13:56 på vardagar (utom sommaren)",
+      "disembark_only": "Vissa avgångar är endast för avstigning vid Barnängsbryggan, Lumabryggan och Henriksdalsbryggan",
+      "service_stop": "Tisdagar: 09:28, 09:50, 09:56 ingen trafik på grund av service"
+    }
+  },
+  "service_configuration": {
+    "stop_sequence": {
+      "to_city": [
+        "Barnängsbryggan",
+        "Lumabryggan",
+        "Henriksdalsbryggan",
+        "Masthamnen",
+        "Djurgården",
+        "Nybroplan"
+      ],
+      "from_city": [
+        "Nybroplan",
+        "Djurgården",
+        "Masthamnen",
+        "Barnängsbryggan",
+        "Lumabryggan",
+        "Henriksdalsbryggan"
+      ]
+    },
+    "disembark_only_rules": {
+      "description": "Allmänna regler för 'Endast avstigning'. Detaljerad information finns i respektive tidtabellfil.",
+      "weekday": {
+        "morning_after": "12:14",
+        "afternoon_after": "18:44"
+      },
+      "weekend": {
+        "after_lunch": "13:14",
+        "evening": "17:44"
+      },
+      "affected_stops": [
+        "Barnängsbryggan",
+        "Lumabryggan",
+        "Henriksdalsbryggan"
+      ],
+      "notes": "Endast riktning 'from_city' påverkas av dessa regler"
+    }
+  },
+  "season_mapping": [
+    {
+      "name": "Winter 2024-2025",
+      "period": {
+        "start": "2024-11-04",
+        "end": "2025-04-21"
+      },
+      "files": {
+        "weekday": "ressel-city-weekday-winter.json",
+        "saturday": "ressel-city-weekend-winter.json",
+        "sunday": "ressel-city-weekend-winter.json"
+      },
+      "holiday_rules": {
+        "no_traffic": ["2024-12-24", "2024-12-25", "2024-12-26", "2024-12-31", "2025-01-01"],
+        "weekend_schedule": ["2025-01-06", "2025-04-18", "2025-04-19", "2025-04-20", "2025-04-21"]
+      }
+    },
+    {
+      "name": "Spring 2025",
+      "period": {
+        "start": "2025-04-22",
+        "end": "2025-06-19"
+      },
+      "files": {
+        "weekday": "ressel-city-spring-2025-weekday.json",
+        "saturday": "ressel-city-spring-2025-saturday.json",
+        "sunday": "ressel-city-spring-2025-sunday.json"
+      },
+      "holiday_rules": {
+        "weekend_schedule": ["2025-05-01", "2025-05-29", "2025-06-06"]
+      },
+      "note": "Spring har unika helgtidtabeller med fler avgångar"
+    },
+    {
+      "name": "Summer 2025",
+      "period": {
+        "start": "2025-06-20",
+        "end": "2025-08-17"
+      },
+      "files": {
+        "weekday": "ressel-city-summer-2025-weekday.json",
+        "saturday": "ressel-city-summer-2025-saturday.json",
+        "sunday": "ressel-city-summer-2025-sunday.json"
+      },
+      "holiday_rules": {
+        "weekend_schedule": ["2025-06-20", "2025-06-21"]
+      },
+      "note": "Summer har unika tidtabeller med lunch-avgång på vardagar"
+    },
+    {
+      "name": "Fall 2025",
+      "period": {
+        "start": "2025-08-18",
+        "end": "2025-09-21"
+      },
+      "files": {
+        "weekday": "ressel-city-fall-2025-weekday.json",
+        "saturday": "ressel-city-fall-2025-saturday.json",
+        "sunday": "ressel-city-fall-2025-sunday.json"
+      },
+      "note": "Fall har unika helgtidtabeller med många avgångar"
+    },
+    {
+      "name": "Fall Extended 2025",
+      "period": {
+        "start": "2025-09-22",
+        "end": "2025-11-13"
+      },
+      "files": {
+        "weekday": "ressel-city-fall-extended-2025-weekday.json",
+        "saturday": "ressel-city-fall-extended-2025-saturday.json",
+        "sunday": "ressel-city-fall-extended-2025-sunday.json"
+      },
+      "note": "Fall extended har färre helgavgångar än Fall"
+    },
+    {
+      "name": "Maintenance Nov-Dec 2025",
+      "period": {
+        "start": "2025-11-14",
+        "end": "2025-12-12"
+      },
+      "files": {
+        "weekday": "ressel-city-maintenance-2025-weekday.json",
+        "saturday": "ressel-city-maintenance-2025-saturday.json",
+        "sunday": "ressel-city-maintenance-2025-sunday.json"
+      },
+      "maintenance_mode": true,
+      "note": "Tillfälligt uppehåll pga broarbeten"
+    },
+    {
+      "name": "Winter 2025-2026",
+      "period": {
+        "start": "2025-12-13",
+        "end": "2026-04-19"
+      },
+      "files": {
+        "weekday": "ressel-city-weekday-winter.json",
+        "saturday": "ressel-city-weekend-winter.json",
+        "sunday": "ressel-city-weekend-winter.json"
+      },
+      "holiday_rules": {
+        "no_traffic": ["2025-12-24", "2025-12-25", "2025-12-26", "2025-12-31", "2026-01-01"],
+        "weekend_schedule": ["2026-01-06", "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06"],
+        "extra_departures_periods": [
+          {
+            "name": "Jullov",
+            "weeks": ["V52", "V1"],
+            "dates": "22 dec 2025 - 2 jan 2026",
+            "note": "Extra lunch-avgång kl 13:44 (till city) och 14:20 (från city)"
+          },
+          {
+            "name": "Sportlov",
+            "weeks": ["V8", "V9"],
+            "dates": "16 feb - 1 mars 2026",
+            "note": "Extra lunch-avgång kl 13:44 (till city) och 14:20 (från city)"
+          }
+        ]
+      },
+      "note": "Återanvänder samma filer som Winter 2024-2025. Lunch-avgång finns i filen men gäller endast under lov-perioder."
+    }
+  ]
+}
