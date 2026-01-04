@@ -1,0 +1,23 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]  # Eller den branch du använder
+  workflow_dispatch:    # Tillåter manuell körning
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v3
+      
+    # Om du behöver någon build-process, lägg till stegen här
+    # Till exempel för minifiering, etc.
+    
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: gh-pages  # Branch där GitHub Pages kommer att publiceras
+        folder: .         # Mappen som innehåller de statiska filerna
