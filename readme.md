@@ -1,10 +1,9 @@
 # Sjöstadsfärjetrafiken
 
 ![Sjöstadsfärjetrafiken Screenshot](images/screenshot.png)
-
 ![Sjöstadsfärjetrafiken med meny för personliga inställningar](images/screenshot2.png)
 
-En modern, helt statisk webbapplikation för att visa realtidstidtabeller för båtlinjerna i Hammarby Sjöstad: **Sjöstadstrafiken** och **M/S Emelie**.
+En modern webbapplikation för att visa realtidstidtabeller för båtlinjerna i Hammarby Sjöstad: **Sjöstadstrafiken** och **M/S Emelie**.
 
 **Live-demo:**  
 https://minaprojekt.github.io/ressel-timetable/
@@ -13,86 +12,89 @@ https://minaprojekt.github.io/ressel-timetable/
 
 ## Funktioner
 
-- Realtidsvisning – Avgångar uppdateras automatiskt varje minut
-- Smart tidmarkering:
+- **Realtidsvisning** – Avgångar uppdateras automatiskt varje minut
+- **Smart tidmarkering**
   - 🟢 Grön ram = Nästa avgång (mer än 10 minuter)
   - 🟡 Gul ram = Snar avgång (mindre än 10 minuter)
   - *Kursiv text* = Morgondagens första avgångar
-- Flexibel visning av linjer och antal avgångar
-- Brygganpassning för snabb överblick
-- Mörkt tema – även lämpat för digital skyltning
-- Offline-stöd via service worker
-- Mobilvänlig / PWA – kan installeras som app
-- Automatisk hantering av helgdagar
+- **Flexibel visning** – Anpassa antal avgångar och vilka linjer som visas
+- **Brygganpassning** – Markera din brygga för snabb översikt
+- **Mörkt tema** – Perfekt för digital skyltning
+- **Offline-stöd** – Fungerar även utan internetuppkoppling
+- **Mobilvänlig / PWA** – Installeras som app
+- **Helgdagshantering** – Växlar automatiskt till helgtidtabell
 
 ---
 
 ## Kom igång
 
-### Snabbstart
-1. Öppna https://minaprojekt.github.io/ressel-timetable/
-2. Klart 🎉
+### Enkel start
+1. Gå till https://minaprojekt.github.io/ressel-timetable/
+2. Klart! 🎉
 
 ### Lokal användning
-Applikationen är helt statisk och kräver ingen build-process.
+1. Klona eller ladda ner repot
+2. Öppna `index.html` i webbläsaren
 
+Alternativt:
 ```bash
 python3 -m http.server 8000
-# Öppna http://localhost:8000
-```
-
-Du kan även öppna `index.html` direkt i webbläsaren.
-
----
-
-## Hosting
-
-Projektet fungerar på vilken webbserver som helst.
-
-### Apache
-```bash
-sudo cp -r . /var/www/html/farjetrafiken
-sudo chmod -R 755 /var/www/html/farjetrafiken
-```
-
-### Nginx
-```nginx
-server {
-    listen 80;
-    server_name farjetrafiken.example.com;
-    root /var/www/farjetrafiken;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    location ~* \.json$ {
-        add_header Cache-Control "no-cache, must-revalidate";
-    }
-}
 ```
 
 ---
 
-## Projektstruktur
+## Anpassa applikationen
+
+### Via inställningsmenyn
+Klicka på **”Inställningar”** längst ner i appen:
+
+1. Tidtabeller – välj vilka linjer som ska visas
+2. Visning – ändra antal avgångar (3–15 st)
+3. Bryggor – markera din hemmabrygga
+4. Riktningar – visa/dölj returresor för M/S Emelie
+
+Dina val sparas automatiskt i webbläsaren.
+
+### Via URL-parametrar
+Perfekt för digital skyltning med fasta inställningar.
+
+Exempel:
+```
+?sjo=1&emelie=1&highlight=Lumabryggan&maxdep=8
+```
+
+Parametrar:
+```
+sjo=1/0
+emelie=1/0
+bothdir=1/0
+highlight=Brygga
+cityhighlight=Brygga
+returnstop=Brygga
+maxdep=3-15
+```
+
+---
+
+## Datastruktur
 
 ```
-ressel-timetable/
-├── index.html
-├── manifest.json
-├── service-worker.js
-├── css/
-├── js/
-├── data/
-└── icons/
+data/
+├── ressel-sjo-config.json
+├── ressel-city-config.json
+├── ressel-sjo-weekday-standard.json
+├── ressel-sjo-weekday-summer.json
+├── ressel-sjo-weekend.json
+├── ressel-city-weekday-winter.json
+├── ressel-city-weekend-winter.json
+└── ressel-city-maintenance-*.json
 ```
 
 ---
 
 ## Deployment
 
-Projektet deployeras automatiskt till GitHub Pages direkt från `main`-branchen.
+Projektet är helt statiskt och deployeras automatiskt via **GitHub Pages** direkt från `main`-branchen.
 
 Varje `git push` publicerar ändringarna.
 
@@ -100,15 +102,15 @@ Varje `git push` publicerar ändringarna.
 
 ## Bidra
 
-Issues och pull requests är välkomna:  
+Pull requests och issues är välkomna:  
 https://github.com/minaprojekt/ressel-timetable/issues
 
 ---
 
 ## Licens
 
-MIT License.  
-Fri användning, modifiering och distribution är tillåten, med krav på attribution till upphovspersonen.
+MIT License – fri användning, modifiering och distribution är tillåten.  
+**Cred till upphovspersonen krävs.**
 
 Se `LICENSE` för fullständig text.
 
